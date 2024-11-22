@@ -1,27 +1,25 @@
-import ReactMde from "react-mde";
-import Showdown from "showdown";
 import { useState } from "react";
+import MDEditor from "@uiw/react-md-editor";
+import rehypeSanitize from "rehype-sanitize";
 
 export default function Editor({ currentNote, updateNote }) {
 	const [selectedTab, setSelectedTab] = useState("write");
 
-	const converter = new Showdown.Converter.Converter({
-		tables: true,
-		simplifiedAudio: true,
-		strikethrought: true,
-		tasklist: true,
-	});
+	function previewToggle () {
+		setSelectedTab(() => prevSelectedTab === !prevSelectedTab)
+	}
 
 	return (
 		<section className="pane editor">
-			<ReactMde
+			<button onClick={previewToggle}>Preview Only</button>
+			<MDEditor
+				// eslint-disable-next-line react/prop-types
 				value={currentNote.body}
 				onChange={updateNote}
-				selectedTab={selectedTab}
-				onTabChange={setSelectedTab}
-				generateMarkdownPreview={(markdown) =>
-					Promise.resolve(converter.makeHtml(markdown))
-				}
+				previewOptions={{
+					rehypePlugins: [[rehypeSanitize]],
+				}}
+				height="100%"
 			/>
 		</section>
 	);
